@@ -419,16 +419,17 @@ nav .in{max-width:540px;margin:0 auto;display:flex;gap:10px}
   <div class="kick">Almost done</div>
   <h2>Your picks</h2>
   <div class="sum" id="sum"></div>
-  <div class="photos"><b>Please also send on WhatsApp</b><ul><li>Photos of your printed card, if you have one</li><li>8 to 10 favourite photos of you two</li><li>Your pre-wedding film, if it’s ready</li></ul></div>
-  <p class="hint">Tap send and your answers open in WhatsApp. Then just press Send there.</p>
+  <div class="photos"><b>After sending, please share on WhatsApp</b><ul><li>Photos of your printed card, if you have one</li><li>8 to 10 favourite photos of you two</li><li>Your pre-wedding film, if it’s ready</li></ul></div>
+  <p class="hint">Tap send and a short form opens with your picks already filled in. Add your name and press Send to MTRX.</p>
 </section>
 
 <section class="step done" data-k="done">
   <div class="kick">Thank you</div>
   <h1>Almost there</h1>
-  <p class="sub">Your answers are ready in WhatsApp. Please press Send there. If it didn’t open, copy your answers and paste them in the chat.</p>
+  <p class="sub">Your picks are filled in on the form. Just press Send to MTRX there. If it didn’t open, tap below, or send your answers on WhatsApp instead.</p>
   <div class="stack">
-    <button type="button" class="btn wa" id="waAgain">Open WhatsApp again</button>
+    <button type="button" class="btn pri" id="formAgain">Open the form again</button>
+    <button type="button" class="btn wa" id="waAgain">Send on WhatsApp instead</button>
     <button type="button" class="btn ghost" id="copy">Copy my answers</button>
   </div>
 </section>
@@ -518,7 +519,7 @@ $('#tClose').addEventListener('click',()=>{$('#tFull').hidden=true;$('#tPlay').f
 
 /* ---------- navigation ---------- */
 const next=$('#next'),back=$('#back');
-function upd(){const k=steps[cur].dataset.k;$('#bar').style.width=(cur/(steps.length-2)*100)+'%';back.style.display=(cur===0||k==='done')?'none':'';next.style.display=k==='done'?'none':'';next.className='btn '+(k==='review'?'wa':'pri');next.textContent=k==='intro'?'Let’s begin':k==='review'?'Send on WhatsApp':'Next';if(k==='review')buildSummary()}
+function upd(){const k=steps[cur].dataset.k;$('#bar').style.width=(cur/(steps.length-2)*100)+'%';back.style.display=(cur===0||k==='done')?'none':'';next.style.display=k==='done'?'none':'';next.className='btn pri';next.textContent=k==='intro'?'Let’s begin':k==='review'?'Send my picks':'Next';if(k==='review')buildSummary()}
 function go(d){const n=cur+d;if(n<0||n>=steps.length)return;steps[cur].classList.remove('on');cur=n;steps[cur].classList.add('on');loadImgs(steps[cur]);loadImgs(steps[cur+1]);window.scrollTo(0,0);upd();if(steps[cur].dataset.k==='motion')playReel()}
 
 /* ---------- summary ---------- */
@@ -540,10 +541,15 @@ function txt(){const L=['*Sona & Tejas · Website look & feel*'];if(v('name'))L.
  if(v('loves')){L.push('*Also loved:* '+v('loves'))}
  if(v('songs')){L.push('*Songs:* '+v('songs'))}
  return L.join('\n')}
+const FORM_URL='https://forms.clickup.com/90161376302/f/2kz0jv1e-2776/B58NZORK92WRK01CZE';
+function clean(t){return t.replace(/\*/g,'').replace(/&/g,' and ').replace(/\+/g,' and ').replace(/-/g,' ').replace(/[\u2018\u2019]/g,"'").replace(/[\u201C\u201D]/g,"'").replace(/[\u00B7\u2022\u2013\u2014]/g,',').replace(/[^A-Za-z0-9 .,:;'()?!\/@+\n]/g,'').replace(/ {2,}/g,' ').replace(/ ,/g,',').trim()}
+function formLink(){const q='Couple='+encodeURIComponent('Sona and Tejas')+'&Answers='+encodeURIComponent(clean(txt())).replace(/%0A/g,'%0D%0A');return FORM_URL+'?'+q}
+function openForm(){try{navigator.clipboard&&navigator.clipboard.writeText(clean(txt())).catch(()=>{})}catch(e){}window.open(formLink(),'_blank','noopener')}
 function openWA(){window.open('https://wa.me/'+WA_NUMBER+'?text='+encodeURIComponent(txt()),'_blank','noopener')}
-next.addEventListener('click',()=>{if(steps[cur].dataset.k==='review'){openWA();go(1)}else go(1)});
+next.addEventListener('click',()=>{if(steps[cur].dataset.k==='review'){openForm();go(1)}else go(1)});
 back.addEventListener('click',()=>go(-1));
 $('#waAgain').addEventListener('click',openWA);
+$('#formAgain').addEventListener('click',openForm);
 $('#copy').addEventListener('click',async()=>{const t=txt();try{await navigator.clipboard.writeText(t);$('#copy').textContent='Copied ✓'}catch(e){window.prompt('Copy your answers:',t)}});
 loadImgs(steps[1]);
 upd();
